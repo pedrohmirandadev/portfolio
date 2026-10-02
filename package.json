@@ -1,0 +1,31 @@
+{
+  "name": "pedro-oliveira-portfolio",
+  "version": "1.0.0",
+  "description": "An editorial portfolio for Pedro Oliveira: order from complexity.",
+  "scripts": {
+    "dev": "next dev --hostname 0.0.0.0",
+    "build": "next build",
+    "start": "next start --hostname 0.0.0.0",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@tailwindcss/postcss": "4.3.3",
+    "lucide-react": "1.49.0",
+    "motion": "13.4.6",
+    "next": "16.3.8",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "tailwindcss": "4.3.3"
+  },
+  "devDependencies": {
+    "@types/node": "26.6.3",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "eslint": "9.39.5",
+    "eslint-config-next": "16.3.8",
+    "postcss": "8.5.28",
+    "typescript": "6.0.3"
+  },
+  "private": true
+}
