@@ -25,9 +25,14 @@ export default function SystemSculpture({ paused, organized, reducedMotion, them
     let visible = true, blend = organizedRef.current ? 1 : 0;
     let pointerX = cameraRef.current.x, pointerY = cameraRef.current.y;
     let easedX = pointerX, easedY = pointerY;
+    const colors = getComputedStyle(document.documentElement);
+    const baseColor = colors.getPropertyValue("--sculpture-base").trim();
+    const accentColor = colors.getPropertyValue("--sculpture-accent").trim();
+    const threadColor = colors.getPropertyValue("--sculpture-thread").trim();
+    const rings = 128, strands = 24;
     const points: { x: number; y: number; z: number; sx: number; sy: number; sz: number; accent: boolean }[] = [];
-    for (let i = 0; i < 160; i++) {
-      const t = (i / 160) * Math.PI * 2;
+    for (let i = 0; i < rings; i++) {
+      const t = (i / rings) * Math.PI * 2;
       const radius = 1.7 + 0.6 * Math.cos(3 * t);
       const x = radius * Math.cos(2 * t), y = radius * Math.sin(2 * t), z = 0.8 * Math.sin(3 * t);
       const nextT = t + 0.001;
@@ -39,10 +44,10 @@ export default function SystemSculpture({ paused, organized, reducedMotion, them
       const normalLength = Math.hypot(tx, ty);
       const nx = -ty / normalLength, ny = tx / normalLength;
       const bx = -tz * ny, by = tz * nx, bz = tx * ny - ty * nx;
-      for (let j = 0; j < 28; j++) {
-        const a = (j / 28) * Math.PI * 2;
+      for (let j = 0; j < strands; j++) {
+        const a = (j / strands) * Math.PI * 2;
         const tube = 0.38;
-        const seed = i * 28 + j;
+        const seed = i * strands + j;
         points.push({
           x: x + tube * (Math.cos(a) * nx + Math.sin(a) * bx),
           y: y + tube * (Math.cos(a) * ny + Math.sin(a) * by),
@@ -50,7 +55,7 @@ export default function SystemSculpture({ paused, organized, reducedMotion, them
           sx: Math.sin(seed * 12.9898) * 3.1,
           sy: Math.cos(seed * 7.233) * 2.5,
           sz: Math.sin(seed * 3.791) * 2.5,
-          accent: (i > 35 && i < 72) || (i > 115 && i < 132),
+          accent: (i > 28 && i < 58) || (i > 92 && i < 106),
         });
       }
     }
@@ -87,10 +92,26 @@ export default function SystemSculpture({ paused, organized, reducedMotion, them
         const z2 = y * Math.sin(rx) + z1 * Math.cos(rx);
         const perspective = 7 / (7 - z2);
         return { x: width / 2 + x1 * scale * perspective, y: height / 2 + y1 * scale * perspective, z: z2, accent: p.accent, perspective };
-      }).sort((a, b) => a.z - b.z);
+      });
+      // Sparse longitudinal threads reveal the structure without a second renderer.
+      if (blend > 0.01) {
+        ctx.strokeStyle = threadColor;
+        ctx.globalAlpha = blend * (theme === "dark" ? 0.16 : 0.12);
+        ctx.lineWidth = 0.65;
+        ctx.beginPath();
+        for (let strand = 0; strand < strands; strand += 4) {
+          for (let ring = 0; ring < rings; ring++) {
+            const from = projected[ring * strands + strand];
+            const to = projected[((ring + 1) % rings) * strands + strand];
+            ctx.moveTo(from.x, from.y); ctx.lineTo(to.x, to.y);
+          }
+        }
+        ctx.stroke(); ctx.globalAlpha = 1;
+      }
+      projected.sort((a, b) => a.z - b.z);
       for (const p of projected) {
         const alpha = 0.18 + ((p.z + 3) / 6) * 0.7;
-        const color = p.accent ? (theme === "dark" ? "255, 153, 95" : "202, 87, 39") : (theme === "dark" ? "212, 232, 188" : "38, 65, 36");
+        const color = p.accent ? accentColor : baseColor;
         ctx.fillStyle = `rgba(${color}, ${Math.min(1, alpha + (p.accent ? 0.1 : 0))})`;
         ctx.beginPath(); ctx.arc(p.x, p.y, (width < 500 ? 0.93 : 1.25) * p.perspective, 0, Math.PI * 2); ctx.fill();
       }

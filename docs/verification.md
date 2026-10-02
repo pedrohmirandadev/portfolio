@@ -44,3 +44,20 @@ Validated after the living-blueprint redesign:
 - Visible app source has no accented spelling of "resume".
 
 Desktop theme previews: `previews/desktop-dark.jpg` and `previews/desktop-light.jpg`. Reduced-motion branches were reviewed in source; the operating-system preference was not changed. No production deployment was performed.
+
+
+## Version 3 · connected atlas and Node 24 · October 2, 2026
+
+- Node.js 24.21.0 installed through nvm and pinned in `.nvmrc` and `.node-version`. The package engine targets Node 24; GitHub Actions reads the runtime pin. Node typings are aligned to 24.19.1. Next.js remains exactly 16.3.8.
+- A clean `npm ci` succeeds with zero reported vulnerabilities. `npm run typecheck`, `npm run lint`, and `npm run build` pass under Node 24.21.0. The generated static export was served locally for browser inspection.
+- Desktop (1440 × 900) and mobile (390 × 844, 320 × 740) inspected. English dark and Portuguese light layouts have no horizontal overflow or out-of-viewport headings, paragraphs, atlas selectors, or signal-strip text at the checked narrow sizes.
+- Atlas node selection and keyboard activation of layer controls update the highlighted route, title, explanation, skills, and pressed state. All four layers were exercised across desktop and mobile.
+- The global motion control pauses the atlas route animation (verified through its computed animation play state) and resumes it. Reduced-motion branches and the CSS media query were reviewed in source; the OS preference was not changed.
+- Light + Portuguese choices survive a reload, including `html.lang="pt-BR"`. The new atlas labels, copy, and accessible controls are translated.
+- Desktop and mobile Resume dialogs open, close with Escape, and return focus. The original English resume PDF responds with HTTP 200 and `application/pdf`.
+- Work tabs respond to arrow keys; the translated field-note dialog opens and closes with Escape, restoring focus to its trigger. Mobile navigation opens the Resume overview.
+- No browser warnings or errors observed. Contact and profile destinations remain intact.
+
+The sculpture now draws sparse longitudinal threads using semantic color tokens and 3,072 points (previously 4,480). Canvas visibility, pixel-density limits, lifecycle cleanup, and static reduced-motion rendering remain in place. The atlas is an illustrative map of resume-backed capabilities, not a claim about a client’s production architecture.
+
+New preview captures are in `previews/desktop-v3-dark.jpg`, `previews/atlas-v3-dark.jpg`, and `previews/mobile-v3-light.jpg`. No production deployment or outbound communication was performed.

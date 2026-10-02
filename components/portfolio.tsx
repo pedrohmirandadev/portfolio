@@ -1,12 +1,13 @@
 "use client";
 
 import { useEffect, useRef, useState, useSyncExternalStore, type KeyboardEvent, type ReactNode } from "react";
-import { AnimatePresence, MotionConfig, motion, useReducedMotion } from "motion/react";
+import { AnimatePresence, MotionConfig, motion, useReducedMotion, useScroll } from "motion/react";
 import { Asterisk, ArrowDown, ArrowUpRight, Check, Copy, Download, FileText, Menu, Moon, Pause, Play, Plus, Sun, X } from "lucide-react";
 import { profile, type CaseStudy } from "@/lib/content";
 import { localizedContent, translations, type Copy as SiteCopy, type Locale } from "@/lib/translations";
 import { usePreferences } from "@/lib/preferences";
 import SystemSculpture from "./system-sculpture";
+import SystemAtlas from "./system-atlas";
 
 const ease = [0.22, 1, 0.36, 1] as const;
 const narrowQuery = "(max-width: 650px)";
@@ -84,6 +85,7 @@ function EventsVisual({ t }: { t: SiteCopy }) {
 export default function Portfolio() {
   const reduced = useReducedMotion();
   const { theme, locale, setTheme, setLocale } = usePreferences();
+  const { scrollYProgress } = useScroll();
   const narrow = useSyncExternalStore(subscribeViewport, narrowSnapshot, serverViewport);
   const t = translations[locale];
   const content = localizedContent[locale];
@@ -132,6 +134,7 @@ export default function Portfolio() {
   return <MotionConfig reducedMotion="user" transition={{ ease, duration: 0.5 }}>
     <title>{locale === "pt" ? "Pedro Oliveira — Ordem na complexidade" : "Pedro Oliveira — Order from complexity"}</title>
     <div className={`site ${paused || reduced ? "motion-paused" : ""}`} data-locale={locale}>
+      <motion.div className="reading-progress" style={{ scaleX: scrollYProgress }} aria-hidden="true" />
       <a className="skip-link" href="#main">{t.skip}</a>
       <header className="header page-shell">
         <a href="#" className="wordmark" aria-label={`Pedro Oliveira — ${t.backTop}`}>p<span>/</span>o<span className="wordmark-dot">.</span></a><span className="header-name">Pedro Oliveira<span>{t.role}</span></span>
@@ -151,6 +154,8 @@ export default function Portfolio() {
           <div className="hero-bottom"><span className="eyebrow">↳ {t.heroLocation}</span><a href="#work" className="hero-proof"><span className="proof-before">26s</span><span className="proof-line" aria-hidden="true" /><strong>500ms</strong><span className="mono">52× {t.faster}</span></a><span className="eyebrow hero-scroll">{t.scroll}<ArrowDown size={13} /></span></div>
         </section>
 
+        <div className="signal-strip page-shell">{[t.signalDepth, t.signalPerspective, t.signalOutcome].map((label, index) => <span key={index}><span className="mono">0{index + 1}</span>{label}<Asterisk size={23} strokeWidth={1} aria-hidden="true" /></span>)}</div>
+
         <section id="work" className="work-section page-shell" aria-labelledby="work-title"><Reveal className="section-heading"><div><span className="eyebrow section-kicker">{t.workKicker}</span><h2 id="work-title">{t.workTitle}<br /><em>{t.workTitleAccent}</em></h2></div><p>{t.workIntro}</p></Reveal>
           <Reveal className="work-explorer"><div className="work-index" role="tablist" aria-label={t.workTabLabel} aria-orientation={narrow ? "horizontal" : "vertical"}>{content.studies.map((item, index) => <button ref={(node) => { tabs.current[index] = node; }} key={item.id} id={`work-tab-${index}`} role="tab" aria-selected={activeWork === index} aria-controls="work-panel" tabIndex={activeWork === index ? 0 : -1} onClick={() => setActiveWork(index)} onKeyDown={(event) => onTabKey(event, index)}><span className="mono work-number">0{index + 1}</span><span className="work-tab-copy"><strong>{t.contexts[index]}</strong><small>{t.domains[index]}</small></span><ArrowUpRight size={18} /></button>)}</div>
             <div className={`work-panel work-panel-${activeWork}`} id="work-panel" role="tabpanel" aria-labelledby={`work-tab-${activeWork}`} tabIndex={0}><motion.div className="work-visual" key={study.id} initial={reduced ? false : { opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, ease }}>{activeWork === 0 ? <PerformanceVisual t={t} /> : activeWork === 1 ? <FactoryVisual t={t} /> : <EventsVisual t={t} />}</motion.div><div className="work-description"><span className="eyebrow">{study.category}</span><h3>{study.title}</h3><p>{study.description}</p><div className="work-panel-bottom"><span className="mono">{activeWork === 0 ? "BMW / act digital" : activeWork === 1 ? "Metadil" : "Inmetrics"}</span><button className="inline-link" onClick={() => setActiveCase(activeWork)}>{t.readStudy}<ArrowUpRight size={17} /></button></div></div></div>
@@ -159,7 +164,7 @@ export default function Portfolio() {
 
         <section id="about" className="about-section page-shell" aria-labelledby="about-title"><Reveal className="about-heading"><span className="eyebrow section-kicker">{t.aboutKicker}</span><h2 id="about-title">{t.aboutTitle}<br /><em>{t.aboutAccent}</em></h2></Reveal><div className="about-grid"><Reveal className="about-story"><div className="about-lead"><Asterisk className="asterisk" aria-hidden="true" strokeWidth={1.2} /><p>{t.aboutLead}<span>{t.aboutLeadAccent}</span></p></div><p>{t.aboutBody}</p><p>{t.aboutNow}</p><div className="about-signature"><span className="signature">Pedro.</span><div><span className="mono">04+ / {t.heroYears}</span><span>{t.aboutLocation}</span></div></div></Reveal><Reveal className="experience-list" delay={0.1}><div className="experience-heading"><span className="eyebrow">{t.journey}</span><span className="mono">2022—{t.today}</span></div>{content.experience.map((job, index) => <div className={`experience-item ${expanded === index ? "expanded" : ""}`} key={job.company}><button aria-expanded={expanded === index} aria-controls={`experience-${index}`} onClick={() => setExpanded(expanded === index ? null : index)}><span className="experience-number mono">0{index + 1}</span><span className="experience-title"><span className="mono experience-dates">{job.dates}</span><strong>{job.company}</strong></span><Plus className="experience-plus" size={18} /></button><div id={`experience-${index}`} hidden={expanded !== index} className="experience-detail">{job.partner && <small>{job.partner}</small>}<span>{job.role}</span><p>{job.description}</p>{job.current && <span className="current-label mono">{t.current}</span>}</div></div>)}</Reveal></div></section>
 
-        <section className="toolkit-section" aria-labelledby="toolkit-title"><div className="page-shell"><Reveal className="section-heading"><div><span className="eyebrow section-kicker">{t.toolkitKicker}</span><h2 id="toolkit-title">{t.toolkitTitle}<br /><em>{t.toolkitAccent}</em></h2></div><p>{t.toolkitIntro}</p></Reveal><div className="capability-grid">{content.capabilities.map((item, index) => <Reveal className="capability" key={index} delay={index * 0.06}><span className="capability-number mono">0{index + 1} /</span><h3>{item.name}</h3><p>{item.description}</p><div className="capability-tags">{item.technologies.map((tech) => <span key={tech}>{tech}</span>)}</div></Reveal>)}</div><span className="toolkit-footer eyebrow">{t.toolkitFoot}</span></div></section>
+        <section className="toolkit-section" aria-labelledby="toolkit-title"><div className="page-shell"><Reveal className="section-heading"><div><span className="eyebrow section-kicker">{t.toolkitKicker}</span><h2 id="toolkit-title">{t.toolkitTitle}<br /><em>{t.toolkitAccent}</em></h2></div><p>{t.toolkitIntro}</p></Reveal><Reveal><SystemAtlas t={t} locale={locale} /></Reveal><span className="toolkit-footer eyebrow">{t.toolkitFoot}</span></div></section>
 
         <section className="resume-section page-shell"><Reveal><button className="resume-pass" onClick={() => setResumeOpen(true)} aria-label={t.viewResume}><span className="resume-pass-spine mono">PEDRO OLIVEIRA / {t.resume.toUpperCase()}</span><span className="resume-pass-content"><span className="eyebrow">{t.resumeKicker}</span><span className="resume-pass-title">{t.resumeTitle}<br /><em>{t.resumeAccent}</em></span><span className="resume-pass-description">{t.resumeIntro}</span></span><span className="resume-pass-action"><span className="resume-pass-icon"><ArrowUpRight size={32} /></span><span className="mono">{t.viewResume}</span><span className="resume-barcode" aria-hidden="true" /></span></button></Reveal></section>
 

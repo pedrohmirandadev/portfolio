@@ -1,12 +1,14 @@
 # Pedro Oliveira · Order from complexity
 
-A living blueprint for Pedro’s work: luminous generative geometry, oversized editorial typography, an interactive work explorer, and a resume pass that opens a career overview. Both dark and light themes are designed around semantic color tokens.
+A living blueprint for Pedro’s work: luminous threaded geometry, oversized editorial typography, an interactive work explorer, a connected architecture atlas, and a resume pass that opens a career overview. Both dark and light themes are designed around semantic color tokens.
 
 ## Run
 
-Requires Node.js 20.9 or newer.
+Requires Node.js **24**. Local development and CI are pinned to **24.21.0**, and Node typings match the 24 release line.
 
 ```sh
+nvm install
+nvm use
 npm ci
 npm run dev
 ```
@@ -34,7 +36,9 @@ npm run build
 
 The endpoint comparison uses the resume's verified 26s → 500ms figures (approximately 98% lower latency, 52× faster). The work explorer supports pointer input and arrow-key navigation. Native dialogs handle focus trapping, Escape, and focus restoration. Experience entries expand and contact email can be copied. The resume pass opens a bilingual overview with experience, education, and languages; its download remains the original English PDF, labeled explicitly. The UI uses the spelling "Resume" throughout.
 
-Continuous motion can be paused. The sculpture responds to the pointer and switches between connected and scattered points. Canvas work pauses when hidden or outside the viewport, limits pixel density, and renders a static frame for reduced motion. Native scrolling and keyboard focus are preserved.
+The toolkit’s system atlas lets visitors select four connected layers to explore backend, messaging, architecture, and interface skills. Both the diagram nodes and layer controls are native keyboard-accessible buttons. Its map and explanations are conceptual, based on the capabilities in the resume; they do not depict client infrastructure. A fine reading-progress line and an editorial strip carry the blueprint direction through the page.
+
+Continuous motion can be paused. The sculpture responds to the pointer and switches between connected and scattered points. Canvas work pauses when hidden or outside the viewport, limits pixel density, uses semantic theme colors, and renders a static frame for reduced motion. Native scrolling and keyboard focus are preserved.
 
 Education is shown as in progress where appropriate; employment details reflect the supplied resume rather than a live feed. Update these in the content module when circumstances change. There is no contact backend: email opens the visitor's mail app.
 
